@@ -542,7 +542,7 @@ void FixedwingAttitudeControl::Run()
 
 					/* Run attitude RATE controllers which need the desired attitudes from above, add trim */
 					const Vector3f att_control = _rate_control.update(rates, rates_setpoint, angular_accel, dt, _landed);
-					float roll_u = att_control(0);
+					float roll_u = att_control(0) * _airspeed_scaling * _airspeed_scaling;
 					_actuator_controls.control[actuator_controls_s::INDEX_ROLL] =
 						(PX4_ISFINITE(roll_u)) ? roll_u + trim_roll : trim_roll;
 
@@ -550,7 +550,7 @@ void FixedwingAttitudeControl::Run()
 						_roll_ctrl.reset_integrator();
 					}
 
-					float pitch_u = att_control(1);
+					float pitch_u = att_control(1) * _airspeed_scaling * _airspeed_scaling;
 					_actuator_controls.control[actuator_controls_s::INDEX_PITCH] =
 						(PX4_ISFINITE(pitch_u)) ? pitch_u + trim_pitch : trim_pitch;
 
@@ -564,7 +564,7 @@ void FixedwingAttitudeControl::Run()
 						yaw_u = _wheel_ctrl.control_bodyrate(dt, control_input);
 
 					} else {
-						yaw_u = att_control(2);
+						yaw_u = att_control(2) * _airspeed_scaling * _airspeed_scaling;
 					}
 
 					_actuator_controls.control[actuator_controls_s::INDEX_YAW] = (PX4_ISFINITE(yaw_u)) ? yaw_u + trim_yaw : trim_yaw;
